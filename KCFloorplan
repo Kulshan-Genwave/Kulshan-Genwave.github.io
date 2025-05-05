@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+<head>
+  <meta charset="UTF-8">
+  <title>Image Display</title>
+</head> 
+-->
+<body>
+  <img src="your-image.jpg" alt="Main Floor">
+</body>
+</html>
