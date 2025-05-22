@@ -1,3 +1,4 @@
+New Naming Scheme:
 CompanyProjectnamePurpose
 
 Examples:
