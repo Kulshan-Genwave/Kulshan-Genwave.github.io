@@ -1,0 +1,6 @@
+CompanyProjectnamePurpose
+
+Examples:
+ - KimberlyClarkHuntsvilleFloorplan20250522
+ - KimberlyClarkHuntsvilleWeather
+ - EllisDonWestLincolnMemorialHospitalWeather
