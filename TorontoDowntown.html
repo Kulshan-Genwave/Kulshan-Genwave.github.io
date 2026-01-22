@@ -144,14 +144,15 @@
     .wind-arrow { 
       width: 16px; height: 16px; 
       border: solid currentColor; 
-      border-width: 0 3px 3px 0; 
+      border-width: 2px 2px 0 0; 
       transform-origin: center;
+      transform: rotate(45deg);
     }
     .gust { font-size: 14px; opacity: 0.9; margin-top: 4px; }
     .wind-fast { color: #ffd54f; }
     .wind-storm { color: #ff8a80; }
     
-    /* Controls - back to top right, refresh rightmost */
+    /* Controls - top right, refresh rightmost */
     .controls { 
       position: absolute; 
       top: 40px; right: 40px; 
@@ -168,7 +169,6 @@
       font-size: 20px; 
       cursor: pointer;
       transition: all 0.2s ease;
-      order: 2; /* Puts refresh rightmost */
     }
     .refresh:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
     .theme-btn { 
@@ -182,7 +182,6 @@
       transition: all 0.2s ease;
       opacity: 0.8;
       border: 1px solid rgba(255,255,255,0.1);
-      order: 1;
     }
     .theme-btn:hover, .theme-btn.active { 
       opacity: 1; 
@@ -251,6 +250,11 @@
       return 'wind-storm';
     }
 
+    function getWindArrowRotation(deg) {
+      // North (0°) points up, East (90°) points right, etc.
+      return (deg - 45); // Offset so north arrow points up
+    }
+
     function setTheme(theme) {
       document.body.className = '';
       document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
@@ -258,7 +262,7 @@
       document.querySelectorAll(`[onclick="setTheme('${theme}')"]`).forEach(btn => btn.classList.add('active'));
     }
 
-    // 7-Day Forecast
+    // 7-Day Forecast - starts from TODAY (index 0)
     async function loadWeather() {
       const loadingEl = document.getElementById('loading1');
       const forecastEl = document.getElementById('forecast1');
@@ -273,6 +277,7 @@
         const daily = data.daily;
         
         daysEl.innerHTML = '';
+        // Start from today (i=0) through next 6 days
         for (let i = 0; i < 7; i++) {
           const date = new Date(daily.time[i]);
           const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
@@ -298,7 +303,7 @@
             <div class="details">
               <div>Rain/Snow: <span class="rain-snow">${rainChance}%</span> (${rainAmount}mm)</div>
               <div class="wind ${windClass}">
-                <span class="wind-arrow" style="transform: rotate(${windDir}deg)"></span>
+                <span class="wind-arrow" style="transform: rotate(${getWindArrowRotation(windDir)}deg);"></span>
                 ${windSpeed}km/h ${windDirName}
               </div>
             </div>
@@ -353,7 +358,7 @@
             <div class="details">
               <div>Rain/Snow: <span class="rain-snow">${rainChance}%</span></div>
               <div class="wind ${windClass}">
-                <span class="wind-arrow" style="transform: rotate(${windDir}deg)"></span>
+                <span class="wind-arrow" style="transform: rotate(${getWindArrowRotation(windDir)}deg);"></span>
                 ${windSpeed}km/h ${windDirName}
               </div>
               <div class="gust">Gusts: ${windGust}km/h</div>
