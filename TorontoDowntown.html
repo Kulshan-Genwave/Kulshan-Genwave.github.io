@@ -9,17 +9,46 @@
     .widget { width: 1800px; margin: 0 auto; padding: 40px; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); border-radius: 24px; box-shadow: 0 16px 60px rgba(0,0,0,0.5); position: relative; }
     .title { text-align: center; font-size: 28px; margin-bottom: 40px; opacity: 0.95; font-weight: 500; letter-spacing: 1px; }
     .days { display: flex; justify-content: space-between; gap: 30px; }
-    .day { flex: 1; background: rgba(255,255,255,0.06); border-radius: 16px; padding: 30px 25px; text-align: center; transition: transform 0.2s; }
+    .day { flex: 1; background: rgba(255,255,255,0.06); border-radius: 16px; padding: 30px 25px; transition: transform 0.2s; position: relative; overflow: hidden; }
+    .day::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 60px; opacity: 0.3; z-index: 0; }
     .day:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); }
-    .day-date { font-size: 20px; opacity: 0.9; margin-bottom: 15px; font-weight: 600; }
+    
+    /* Perfect text alignment grid */
+    .day-content { display: grid; grid-template-rows: auto auto auto 1fr; height: 100%; position: relative; z-index: 1; }
+    .day-date { font-size: 20px; opacity: 0.9; margin-bottom: 15px; font-weight: 600; text-align: center; grid-row: 1; }
     .day-date span { display: block; font-size: 16px; opacity: 0.7; font-weight: 400; }
-    .day-icon { font-size: 48px; margin: 20px 0; }
-    .day-temps { font-size: 42px; font-weight: 700; margin-bottom: 25px; letter-spacing: -2px; }
+    .day-icon { font-size: 48px; margin: 20px auto; grid-row: 2; justify-self: center; }
+    .temps-container { grid-row: 3; position: relative; }
+    .day-temps { font-size: 42px; font-weight: 700; margin-bottom: 25px; letter-spacing: -2px; text-align: center; position: relative; }
     .day-lo { color: #a0c4ff; font-weight: 500; font-size: 36px; }
-    .day-details { font-size: 18px; opacity: 0.9; line-height: 1.6; }
-    .rain { color: #4fd0e7; font-weight: 600; font-size: 20px; }
-    .wind { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 18px; margin-top: 12px; }
-    .wind-arrow { width: 20px; height: 20px; border: solid #fff; border-width: 0 4px 4px 0; transform-origin: center; }
+    
+    /* Temperature waveform background */
+    .waveform { position: absolute; top: 0; left: -100%; width: 200%; height: 100%; opacity: 0.4; z-index: 0; }
+    
+    .day-details { grid-row: 4; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: end; font-size: 18px; opacity: 0.9; line-height: 1.4; }
+    .rain-detail, .wind-detail { text-align: center; }
+    .rain-label { font-weight: 500; }
+    .rain-value { color: #4fd0e7; font-weight: 600; font-size: 20px; }
+    .wind-value { font-weight: 600; font-size: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .wind-arrow { width: 20px; height: 20px; border: solid currentColor; border-width: 0 4px 4px 0; transform-origin: center; }
+    
+    /* Wind color gradient: white(0) → blue(15) → green(25) → yellow(35) → red(50+) */
+    .wind-0 { color: #ffffff; }
+    .wind-1 { color: #a0c4ff; }
+    .wind-2 { color: #4fd0e7; }
+    .wind-3 { color: #90EE90; }
+    .wind-4 { color: #FFD700; }
+    .wind-5 { color: #ff4444; }
+    
+    /* Temp waveform colors: cold blue → purple → warm orange → hot red */
+    .temp-cold { background: linear-gradient(90deg, #4a69bd 0%, #6a4c93 50%, #aa76b8 100%); background-size: 200% 100%; animation: wave 4s ease-in-out infinite; }
+    .temp-cool { background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%); background-size: 200% 100%; animation: wave 4s ease-in-out infinite; }
+    .temp-mild { background: linear-gradient(90deg, #4facfe 0%, #00f2fe 50%, #43e97b 100%); background-size: 200% 100%; animation: wave 4s ease-in-out infinite; }
+    .temp-warm { background: linear-gradient(90deg, #fa709a 0%, #fee140 50%, #f77737 100%); background-size: 200% 100%; animation: wave 4s ease-in-out infinite; }
+    .temp-hot { background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); background-size: 200% 100%; animation: wave 4s ease-in-out infinite; }
+    
+    @keyframes wave { 0%, 100% { transform: translateX(0) translateY(0); } 50% { transform: translateX(-50%) translateY(-5px); } }
+    
     .refresh { position: absolute; top: 40px; right: 40px; background: rgba(255,255,255,0.15); border: none; border-radius: 50%; width: 50px; height: 50px; color: #fff; font-size: 20px; cursor: pointer; opacity: 0.8; transition: all 0.3s; }
     .refresh:hover { opacity: 1; background: rgba(255,255,255,0.25); transform: scale(1.1) rotate(180deg); }
     .loading { text-align: center; font-size: 24px; font-style: italic; opacity: 0.7; padding: 100px 20px; }
@@ -49,61 +78,16 @@
       81: '🌦️', 82: '🌧️', 95: '⛈️'
     };
 
-    async function loadWeather() {
-      document.getElementById('loading').style.display = 'block';
-      document.getElementById('content').style.display = 'none';
-      
-      try {
-        const res = await fetch(URL);
-        const data = await res.json();
-        const daily = data.daily;
-        
-        const daysContainer = document.getElementById('forecast-days');
-        daysContainer.innerHTML = '';
-        
-        for (let i = 0; i < 7; i++) {
-          const dayDiv = document.createElement('div');
-          dayDiv.className = 'day';
-          
-          const date = new Date(daily.time[i]);
-          const dayName = date.toLocaleDateString('en-CA', { weekday: 'short' });
-          const dateStr = date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-          
-          const hi = Math.round(daily.temperature_2m_max[i]);
-          const lo = Math.round(daily.temperature_2m_min[i]);
-          const rainProb = daily.precipitation_probability_max[i];
-          const rainAmount = daily.precipitation_sum[i].toFixed(1);
-          const windSpeed = Math.round(daily.wind_speed_10m_max[i]);
-          const windDir = Math.round(daily.wind_direction_10m_dominant[i]);
-          const dir = dirs[Math.round(windDir / 45) % 8];
-          const iconCode = daily.weather_code[i];
-          const icon = icons[iconCode] || '🌤️';
-          
-          dayDiv.innerHTML = `
-            <div class="day-date">${dayName}<br><span>${dateStr}</span></div>
-            <div class="day-icon">${icon}</div>
-            <div class="day-temps">${hi}° <span class="day-lo">/ ${lo}°</span></div>
-            <div class="day-details">
-              <div>🌧️ Rain: <span class="rain">${rainProb}%</span> (${rainAmount}mm)</div>
-              <div class="wind">
-                💨 <span class="wind-arrow" style="transform: rotate(${windDir}deg);"></span>
-                ${windSpeed}km/h ${dir}
-              </div>
-            </div>
-          `;
-          daysContainer.appendChild(dayDiv);
-        }
-        
-        document.getElementById('content').style.display = 'block';
-      } catch (e) {
-        document.getElementById('loading').innerHTML = 'Error loading forecast data';
-      }
-      
-      document.getElementById('loading').style.display = 'none';
+    function getWindClass(windSpeed) {
+      if (windSpeed < 15) return 'wind-0';
+      if (windSpeed < 25) return 'wind-1';
+      if (windSpeed < 35) return 'wind-2';
+      if (windSpeed < 50) return 'wind-3';
+      return 'wind-4';
     }
 
-    loadWeather();
-    setInterval(loadWeather, 1800000); // Refresh every 30 min
-  </script>
-</body>
-</html>
+    function getTempClass(hiTemp) {
+      if (hiTemp < 0) return 'temp-cold';
+      if (hiTemp < 10) return 'temp-cool';
+      if (hiTemp < 20) return 'temp-mild';
+      if (hiTemp < 30) retu
