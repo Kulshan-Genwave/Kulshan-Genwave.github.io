@@ -12,14 +12,55 @@
       color: white; 
       padding: 30px;
     }
+    
+    /* Theme: Monday.com Dark */
+    .theme-monday .widget { 
+      background: linear-gradient(135deg, #191b34 0%, #1a1d3a 50%, #1f2341 100%); 
+      box-shadow: 0 20px 60px rgba(25, 27, 52, 0.5);
+    }
+    .theme-monday .day, .theme-monday .hour { 
+      background: rgba(25, 27, 52, 0.4); 
+    }
+    .theme-monday .temp-lo { color: #b8c1e0; }
+    .theme-monday .rain-snow { color: #c8d0e8; }
+    .theme-monday .wind-slow { color: #e2e5f0; }
+    .theme-monday .wind-med { color: #a8b2d1; }
+    .theme-monday .hours::-webkit-scrollbar-track { background: rgba(25,27,52,0.5); }
+    
+    /* Theme: Windy Dark */
+    .theme-windy .widget { 
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); 
+      box-shadow: 0 20px 60px rgba(15, 52, 96, 0.5);
+    }
+    .theme-windy .day, .theme-windy .hour { 
+      background: rgba(255,255,255,0.08); 
+    }
+    .theme-windy .temp-lo { color: #a0c4ff; }
+    .theme-windy .rain-snow { color: #4fd0e7; }
+    .theme-windy .wind-slow { color: #ffffff; }
+    .theme-windy .wind-med { color: #4fd0e7; }
+    
+    /* Theme: Ocean Blue */
+    .theme-ocean .widget { 
+      background: linear-gradient(135deg, #1f8aa6 0%, #2596be 50%, #2da5c9 100%); 
+      box-shadow: 0 20px 60px rgba(37, 150, 190, 0.3);
+    }
+    .theme-ocean .day, .theme-ocean .hour { 
+      background: rgba(37, 150, 190, 0.15); 
+    }
+    .theme-ocean .temp-lo { color: #b3e5fc; }
+    .theme-ocean .rain-snow { color: #e1f5fe; }
+    .theme-ocean .wind-slow { color: #e1f5fe; }
+    .theme-ocean .wind-med { color: #b3e5fc; }
+    
+    /* Base widget styles */
     .widget { 
       width: 2000px; 
       margin: 0 auto 40px; 
-      background: linear-gradient(135deg, #191b34 0%, #1a1d3a 50%, #1f2341 100%); 
       border-radius: 24px; 
       padding: 40px; 
-      box-shadow: 0 20px 60px rgba(25, 27, 52, 0.5);
       position: relative;
+      transition: all 0.3s ease;
     }
     .title { 
       text-align: center; 
@@ -40,7 +81,7 @@
       height: 8px;
     }
     .hours::-webkit-scrollbar-track {
-      background: rgba(25,27,52,0.5);
+      background: rgba(0,0,0,0.3);
       border-radius: 4px;
     }
     .hours::-webkit-scrollbar-thumb {
@@ -49,11 +90,11 @@
     }
     .day, .hour { 
       flex: 1; 
-      background: rgba(25, 27, 52, 0.4); 
       border-radius: 16px; 
       padding: 25px; 
       text-align: center;
       min-width: 140px;
+      transition: all 0.2s ease;
     }
     .hour { min-width: 130px; padding: 20px 15px; }
     .date { font-size: 20px; margin-bottom: 10px; }
@@ -61,10 +102,8 @@
     .day-name { font-size: 14px; opacity: 0.85; margin-bottom: 8px; font-weight: 500; }
     .icon { font-size: 48px; margin: 15px 0; }
     .temps { font-size: 40px; font-weight: bold; margin-bottom: 20px; }
-    .temp-lo { color: #b8c1e0; font-size: 32px; }
     .hour-temp { font-size: 32px; }
     .details { font-size: 16px; line-height: 1.4; }
-    .rain-snow { color: #c8d0e8; font-weight: bold; }
     .wind { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
     .wind-arrow { 
       width: 16px; height: 16px; 
@@ -73,24 +112,43 @@
       transform-origin: center;
     }
     .gust { font-size: 14px; opacity: 0.9; margin-top: 4px; }
-    /* Wind colors - matching monday.com dark theme */
-    .wind-slow { color: #e2e5f0; }
-    .wind-med { color: #a8b2d1; }
     .wind-fast { color: #ffd54f; }
     .wind-storm { color: #ff8a80; }
     
-    .refresh { 
+    /* Controls */
+    .controls { 
       position: absolute; 
       top: 40px; right: 40px; 
+      display: flex; 
+      gap: 8px; 
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .refresh { 
       width: 50px; height: 50px; 
       border: none; 
-      border-radius: 50%; 
+      border-radius: 12px; 
       background: rgba(255,255,255,0.15); 
       color: white; 
       font-size: 20px; 
       cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .refresh:hover { background: rgba(255,255,255,0.25); }
+    .refresh:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
+    .theme-btn { 
+      width: 50px; height: 30px; 
+      border: none; 
+      border-radius: 8px; 
+      color: white; 
+      font-size: 11px; 
+      cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0.7;
+    }
+    .theme-btn:hover, .theme-btn.active { 
+      opacity: 1; 
+      transform: scale(1.05);
+    }
     .loading { 
       text-align: center; 
       font-size: 24px; 
@@ -99,10 +157,17 @@
     small { opacity: 0.75; font-size: 0.8em; }
   </style>
 </head>
-<body>
+<body class="theme-monday">
   <!-- 7-Day Forecast Widget -->
   <div class="widget" id="widget1">
-    <button class="refresh" onclick="loadWeather()">↻</button>
+    <div class="controls">
+      <button class="refresh" onclick="loadWeather()">↻</button>
+      <div>
+        <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
+        <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
+        <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
+      </div>
+    </div>
     <div id="loading1" class="loading">Loading 7-day forecast...</div>
     <div id="forecast1" style="display:none;">
       <div class="title">DoubleTree Downtown Toronto - 7 Day Forecast</div>
@@ -112,7 +177,14 @@
 
   <!-- 3-Day 3-Hourly Forecast Widget -->
   <div class="widget" id="widget2">
-    <button class="refresh" onclick="loadHourly()">↻</button>
+    <div class="controls">
+      <button class="refresh" onclick="loadHourly()">↻</button>
+      <div>
+        <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
+        <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
+        <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
+      </div>
+    </div>
     <div id="loading2" class="loading">Loading 3-hourly forecast...</div>
     <div id="forecast2" style="display:none;">
       <div class="title">DoubleTree Downtown Toronto - Next 3 Days (Every 3 Hours)</div>
@@ -139,7 +211,17 @@
       return 'wind-storm';
     }
 
-    // 7-Day Forecast
+    function setTheme(theme) {
+      // Remove all theme classes
+      document.body.className = '';
+      document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+      
+      // Apply new theme
+      document.body.classList.add(`theme-${theme}`);
+      document.querySelectorAll(`[onclick="setTheme('${theme}')"]`).forEach(btn => btn.classList.add('active'));
+    }
+
+    // 7-Day Forecast (unchanged logic)
     async function loadWeather() {
       const loadingEl = document.getElementById('loading1');
       const forecastEl = document.getElementById('forecast1');
@@ -194,7 +276,7 @@
       loadingEl.style.display = 'none';
     }
 
-    // 3-Day 3-Hourly Forecast
+    // 3-Day 3-Hourly Forecast (unchanged logic)
     async function loadHourly() {
       const loadingEl = document.getElementById('loading2');
       const forecastEl = document.getElementById('forecast2');
@@ -253,8 +335,6 @@
     // Load both on start
     loadWeather();
     loadHourly();
-    
-    // Auto refresh every 30 minutes
     setInterval(() => {
       loadWeather();
       loadHourly();
