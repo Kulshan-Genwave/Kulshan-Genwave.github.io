@@ -1,1 +1,90 @@
-<iframe width="1600" height="2650" src="https://embed.windy.com/embed.html?type=forecast&location=coordinates&detail=true&detailLat=43.64945211870918&detailLon=-79.38103983323701&metricTemp=default&metricRain=default&metricWind=default" frameborder="400"></iframe>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windy-Style Weather Widget</title>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #fff; }
+    .widget { max-width: 320px; margin: 20px auto; padding: 20px; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
+    .location { text-align: center; font-size: 14px; opacity: 0.8; margin-bottom: 10px; }
+    .temp { font-size: 48px; font-weight: 300; text-align: center; margin: 0 0 10px; letter-spacing: -2px; }
+    .conditions { text-align: center; font-size: 16px; margin-bottom: 20px; opacity: 0.9; }
+    .details { display: flex; justify-content: space-around; font-size: 14px; }
+    .detail { text-align: center; }
+    .label { opacity: 0.7; font-size: 12px; }
+    .wind-arrow { display: inline-block; width: 12px; height: 12px; border: solid #fff; border-width: 0 2px 2px 0; transform-origin: center; transition: transform 0.3s; margin-right: 5px; }
+    .gust { font-size: 12px; opacity: 0.8; }
+    .refresh { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; font-size: 14px; cursor: pointer; opacity: 0.6; }
+    .refresh:hover { opacity: 1; }
+    .loading { text-align: center; font-style: italic; opacity: 0.6; }
+    @keyframes wind { 0%, 100% { transform: translateX(0) rotate(0deg); } 50% { transform: translateX(5px) rotate(5deg); } }
+    .breezy::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #4fd0e7, transparent); animation: wind 2s infinite; }
+  </style>
+</head>
+<body>
+  <div class="widget" id="widget">
+    <button class="refresh" onclick="loadWeather()">↻</button>
+    <div id="loading" class="loading">Loading...</div>
+    <div id="content" style="display: none;">
+      <div class="location" id="location"></div>
+      <div class="temp" id="temp">--°C</div>
+      <div class="conditions" id="conditions"></div>
+      <div class="details">
+        <div class="detail">
+          <div class="label">Rain</div>
+          <div id="rain">--%</div>
+        </div>
+        <div class="detail">
+          <div class="label">Wind</div>
+          <div id="wind"><span class="wind-arrow" id="arrow"></span><span id="wind-speed">-- km/h</span></div>
+          <div class="gust" id="gust"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const LAT = 43.64945211870918; // Brampton, ON
+    const LON = -79.38103983323701;
+    const URL = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m&timezone=America/Toronto`;
+
+    const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    const codes = {
+      0: 'Clear', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
+      45: 'Fog', 48: 'Depositing rime fog', 51: 'Light drizzle', 53: 'Moderate drizzle',
+      55: 'Dense drizzle', 61: 'Slight rain', 63: 'Moderate rain', 65: 'Heavy rain',
+      71: 'Slight snow', 73: 'Moderate snow', 75: 'Heavy snow', 80: 'Slight rain showers',
+      81: 'Moderate rain showers', 82: 'Violent rain showers', 95: 'Thunderstorm'
+    };
+
+    async function loadWeather() {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('content').style.display = 'none';
+      try {
+        const res = await fetch(URL);
+        const data = await res.json();
+        const current = data.current;
+        document.getElementById('location').textContent = 'Brampton, ON';
+        document.getElementById('temp').textContent = Math.round(current.temperature_2m) + '°C';
+        document.getElementById('conditions').textContent = codes[current.weather_code] || 'Unknown';
+        document.getElementById('rain').textContent = current.precipitation_probability + '%';
+        const dir = dirs[Math.round(current.wind_direction_10m / 45) % 8];
+        const arrow = document.getElementById('arrow');
+        arrow.style.transform = `rotate(${current.wind_direction_10m}deg)`;
+        document.getElementById('wind-speed').innerHTML = `${Math.round(current.wind_speed_10m)} km/h <span style="opacity:0.6;">${dir}</span>`;
+        document.getElementById('gust').textContent = current.wind_gusts_10m > 0 ? `Gusts: ${Math.round(current.wind_gusts_10m)} km/h` : '';
+        if (current.wind_speed_10m > 20) document.querySelector('.widget').classList.add('breezy');
+        document.getElementById('content').style.display = 'block';
+      } catch (e) {
+        document.getElementById('conditions').textContent = 'Error loading data';
+      }
+      document.getElementById('loading').style.display = 'none';
+      document.querySelector('.widget').classList.remove('breezy');
+    }
+
+    loadWeather();
+    setInterval(loadWeather, 300000); // Refresh every 5 min
+  </script>
+</body>
+</html>
