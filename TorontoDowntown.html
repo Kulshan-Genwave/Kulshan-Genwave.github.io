@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>7-Day Weather Forecast</title>
+  <title>7-Day + 3-Day Hourly Weather Forecast</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
@@ -13,8 +13,8 @@
       padding: 30px;
     }
     .widget { 
-      width: 1800px; 
-      margin: 0 auto; 
+      width: 2000px; 
+      margin: 0 auto 40px; 
       background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); 
       border-radius: 24px; 
       padding: 40px; 
@@ -27,8 +27,8 @@
       margin-bottom: 40px; 
       font-weight: 500;
     }
-    .days { display: flex; gap: 25px; }
-    .day { 
+    .days, .hours { display: flex; gap: 25px; }
+    .day, .hour { 
       flex: 1; 
       background: rgba(255,255,255,0.08); 
       border-radius: 16px; 
@@ -36,6 +36,7 @@
       text-align: center;
     }
     .date { font-size: 20px; margin-bottom: 10px; }
+    .time { font-size: 18px; margin-bottom: 8px; font-weight: 500; }
     .icon { font-size: 48px; margin: 15px 0; }
     .temps { font-size: 40px; font-weight: bold; margin-bottom: 20px; }
     .temp-lo { color: #a0c4ff; font-size: 32px; }
@@ -66,7 +67,7 @@
       cursor: pointer;
     }
     .refresh:hover { background: rgba(255,255,255,0.3); }
-    .loading, .error { 
+    .loading { 
       text-align: center; 
       font-size: 24px; 
       padding: 100px 40px;
@@ -74,18 +75,30 @@
   </style>
 </head>
 <body>
-  <div class="widget">
+  <!-- 7-Day Forecast Widget -->
+  <div class="widget" id="widget1">
     <button class="refresh" onclick="loadWeather()">↻</button>
-    <div id="loading" class="loading">Loading...</div>
-    <div id="forecast" style="display:none;">
+    <div id="loading1" class="loading">Loading 7-day forecast...</div>
+    <div id="forecast1" style="display:none;">
       <div class="title">Brampton, ON - 7 Day Forecast</div>
-      <div class="days" id="days"></div>
+      <div class="days" id="days1"></div>
+    </div>
+  </div>
+
+  <!-- 3-Day Hourly Forecast Widget -->
+  <div class="widget" id="widget2">
+    <button class="refresh" onclick="loadHourly()">↻</button>
+    <div id="loading2" class="loading">Loading hourly forecast...</div>
+    <div id="forecast2" style="display:none;">
+      <div class="title">Brampton, ON - Next 72 Hours (Hourly)</div>
+      <div class="hours" id="hours2"></div>
     </div>
   </div>
 
   <script>
-    const API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=43.6850&longitude=-79.7858&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code,wind_speed_10m_max,wind_direction_10m_dominant&timezone=America%2FToronto&forecast_days=7';
-
+    const LAT = 43.6850;
+    const LON = -79.7858;
+    
     const icons = {
       0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 45: '🌫️', 48: '🌫️',
       51: '🌦️', 53: '🌦️', 55: '🌧️', 61: '🌦️', 63: '🌧️', 65: '🌧️',
@@ -101,18 +114,21 @@
       return 'wind-storm';
     }
 
+    // 7-Day Forecast
     async function loadWeather() {
-      document.getElementById('loading').style.display = 'block';
-      document.getElementById('forecast').style.display = 'none';
+      const loadingEl = document.getElementById('loading1');
+      const forecastEl = document.getElementById('forecast1');
+      const daysEl = document.getElementById('days1');
+      
+      loadingEl.style.display = 'block';
+      forecastEl.style.display = 'none';
       
       try {
-        const response = await fetch(API_URL);
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code,wind_speed_10m_max,wind_direction_10m_dominant&timezone=America%2FToronto`);
         const data = await response.json();
         const daily = data.daily;
         
-        const daysContainer = document.getElementById('days');
-        daysContainer.innerHTML = '';
-        
+        daysEl.innerHTML = '';
         for (let i = 0; i < 7; i++) {
           const date = new Date(daily.time[i]);
           const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
@@ -143,21 +159,78 @@
               </div>
             </div>
           `;
-          daysContainer.appendChild(dayDiv);
+          daysEl.appendChild(dayDiv);
         }
         
-        document.getElementById('forecast').style.display = 'block';
+        forecastEl.style.display = 'block';
       } catch (error) {
-        document.getElementById('loading').innerHTML = 'Error loading weather. Check internet.';
+        loadingEl.innerHTML = 'Error loading forecast';
       }
-      
-      document.getElementById('loading').style.display = 'none';
+      loadingEl.style.display = 'none';
     }
 
-    // Load immediately
+    // 3-Day Hourly Forecast (72 hours = 72 hourly slots)
+    async function loadHourly() {
+      const loadingEl = document.getElementById('loading2');
+      const forecastEl = document.getElementById('forecast2');
+      const hoursEl = document.getElementById('hours2');
+      
+      loadingEl.style.display = 'block';
+      forecastEl.style.display = 'none';
+      
+      try {
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_direction_10m&timezone=America%2FToronto&forecast_days=3`);
+        const data = await response.json();
+        const hourly = data.hourly;
+        
+        hoursEl.innerHTML = '';
+        // Show next 72 hours (3 days)
+        for (let i = 0; i < 72; i++) {
+          const date = new Date(hourly.time[i]);
+          const timeStr = date.toLocaleString('en-CA', {hour: '2-digit', minute: '2-digit', hour12: true});
+          
+          const temp = Math.round(hourly.temperature_2m[i]);
+          const rainChance = hourly.precipitation_probability[i];
+          const windSpeed = Math.round(hourly.wind_speed_10m[i]);
+          const windDir = Math.round(hourly.wind_direction_10m[i] || 0);
+          const windDirName = directions[Math.floor(windDir / 45) % 8];
+          const weatherCode = hourly.weather_code[i];
+          const icon = icons[weatherCode] || '🌤️';
+          const windClass = getWindClass(windSpeed);
+          
+          const hourDiv = document.createElement('div');
+          hourDiv.className = 'hour';
+          hourDiv.innerHTML = `
+            <div class="time">${timeStr}</div>
+            <div class="icon">${icon}</div>
+            <div class="temps">${temp}°</div>
+            <div class="details">
+              <div>Rain: <span class="rain">${rainChance}%</span></div>
+              <div class="wind ${windClass}">
+                <span class="wind-arrow" style="transform: rotate(${windDir}deg)"></span>
+                ${windSpeed}km/h ${windDirName}
+              </div>
+            </div>
+          `;
+          hoursEl.appendChild(hourDiv);
+        }
+        
+        forecastEl.style.display = 'block';
+      } catch (error) {
+        loadingEl.innerHTML = 'Error loading hourly forecast';
+      }
+      loadingEl.style.display = 'none';
+    }
+
+    // Load both on start
     loadWeather();
-    // Auto refresh every 30 min
-    setInterval(loadWeather, 30 * 60 * 1000);
+    loadHourly();
+    
+    // Auto refresh every 30 minutes
+    setInterval(() => {
+      loadWeather();
+      loadHourly();
+    }, 30 * 60 * 1000);
   </script>
 </body>
 </html>
