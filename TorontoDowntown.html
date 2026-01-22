@@ -8,17 +8,17 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
       font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-      background: #1a1a2e; 
+      background: #0f111a; 
       color: white; 
       padding: 30px;
     }
     .widget { 
       width: 2000px; 
       margin: 0 auto 40px; 
-      background: linear-gradient(135deg, #1f8aa6 0%, #2596be 50%, #2da5c9 100%); 
+      background: linear-gradient(135deg, #191b34 0%, #1a1d3a 50%, #1f2341 100%); 
       border-radius: 24px; 
       padding: 40px; 
-      box-shadow: 0 20px 60px rgba(37, 150, 190, 0.3);
+      box-shadow: 0 20px 60px rgba(25, 27, 52, 0.5);
       position: relative;
     }
     .title { 
@@ -34,22 +34,22 @@
       overflow-x: auto; 
       padding: 10px 0;
       scrollbar-width: thin;
-      scrollbar-color: rgba(255,255,255,0.3) transparent;
+      scrollbar-color: rgba(255,255,255,0.2) transparent;
     }
     .hours::-webkit-scrollbar {
       height: 8px;
     }
     .hours::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.1);
+      background: rgba(25,27,52,0.5);
       border-radius: 4px;
     }
     .hours::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.2);
       border-radius: 4px;
     }
     .day, .hour { 
       flex: 1; 
-      background: rgba(37, 150, 190, 0.15); 
+      background: rgba(25, 27, 52, 0.4); 
       border-radius: 16px; 
       padding: 25px; 
       text-align: center;
@@ -61,10 +61,10 @@
     .day-name { font-size: 14px; opacity: 0.85; margin-bottom: 8px; font-weight: 500; }
     .icon { font-size: 48px; margin: 15px 0; }
     .temps { font-size: 40px; font-weight: bold; margin-bottom: 20px; }
-    .temp-lo { color: #b3e5fc; font-size: 32px; }
+    .temp-lo { color: #b8c1e0; font-size: 32px; }
     .hour-temp { font-size: 32px; }
     .details { font-size: 16px; line-height: 1.4; }
-    .rain-snow { color: #e1f5fe; font-weight: bold; }
+    .rain-snow { color: #c8d0e8; font-weight: bold; }
     .wind { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
     .wind-arrow { 
       width: 16px; height: 16px; 
@@ -73,9 +73,9 @@
       transform-origin: center;
     }
     .gust { font-size: 14px; opacity: 0.9; margin-top: 4px; }
-    /* Wind colors - subtle blue variations */
-    .wind-slow { color: #e1f5fe; }
-    .wind-med { color: #b3e5fc; }
+    /* Wind colors - matching monday.com dark theme */
+    .wind-slow { color: #e2e5f0; }
+    .wind-med { color: #a8b2d1; }
     .wind-fast { color: #ffd54f; }
     .wind-storm { color: #ff8a80; }
     
@@ -85,12 +85,12 @@
       width: 50px; height: 50px; 
       border: none; 
       border-radius: 50%; 
-      background: rgba(255,255,255,0.2); 
+      background: rgba(255,255,255,0.15); 
       color: white; 
       font-size: 20px; 
       cursor: pointer;
     }
-    .refresh:hover { background: rgba(255,255,255,0.3); }
+    .refresh:hover { background: rgba(255,255,255,0.25); }
     .loading { 
       text-align: center; 
       font-size: 24px; 
@@ -105,7 +105,7 @@
     <button class="refresh" onclick="loadWeather()">↻</button>
     <div id="loading1" class="loading">Loading 7-day forecast...</div>
     <div id="forecast1" style="display:none;">
-      <div class="title">Brampton, ON - 7 Day Forecast</div>
+      <div class="title">DoubleTree Downtown Toronto - 7 Day Forecast</div>
       <div class="days" id="days1"></div>
     </div>
   </div>
@@ -115,14 +115,14 @@
     <button class="refresh" onclick="loadHourly()">↻</button>
     <div id="loading2" class="loading">Loading 3-hourly forecast...</div>
     <div id="forecast2" style="display:none;">
-      <div class="title">Brampton, ON - Next 3 Days (Every 3 Hours)</div>
+      <div class="title">DoubleTree Downtown Toronto - Next 3 Days (Every 3 Hours)</div>
       <div class="hours" id="hours2"></div>
     </div>
   </div>
 
   <script>
-    const LAT = 43.6850;
-    const LON = -79.7858;
+    const LAT = 43.6542;  // DoubleTree by Hilton Toronto Downtown
+    const LON = -79.3905;
     
     const icons = {
       0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 45: '🌫️', 48: '🌫️',
