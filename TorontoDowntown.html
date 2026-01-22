@@ -8,17 +8,17 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
       font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-      background: #1e1e2e; 
+      background: #1a1a2e; 
       color: white; 
       padding: 30px;
     }
     .widget { 
       width: 2000px; 
       margin: 0 auto 40px; 
-      background: linear-gradient(135deg, #2596be 0%, #1e88c6 50%, #1976d2 100%); 
+      background: linear-gradient(135deg, #1f8aa6 0%, #2596be 50%, #2da5c9 100%); 
       border-radius: 24px; 
       padding: 40px; 
-      box-shadow: 0 20px 60px rgba(37, 150, 190, 0.4);
+      box-shadow: 0 20px 60px rgba(37, 150, 190, 0.3);
       position: relative;
     }
     .title { 
@@ -49,7 +49,7 @@
     }
     .day, .hour { 
       flex: 1; 
-      background: rgba(255,255,255,0.12); 
+      background: rgba(37, 150, 190, 0.15); 
       border-radius: 16px; 
       padding: 25px; 
       text-align: center;
@@ -61,10 +61,10 @@
     .day-name { font-size: 14px; opacity: 0.85; margin-bottom: 8px; font-weight: 500; }
     .icon { font-size: 48px; margin: 15px 0; }
     .temps { font-size: 40px; font-weight: bold; margin-bottom: 20px; }
-    .temp-lo { color: #e1f5fe; font-size: 32px; }
+    .temp-lo { color: #b3e5fc; font-size: 32px; }
     .hour-temp { font-size: 32px; }
     .details { font-size: 16px; line-height: 1.4; }
-    .rain-snow { color: #e3f2fd; font-weight: bold; }
+    .rain-snow { color: #e1f5fe; font-weight: bold; }
     .wind { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
     .wind-arrow { 
       width: 16px; height: 16px; 
@@ -73,10 +73,10 @@
       transform-origin: center;
     }
     .gust { font-size: 14px; opacity: 0.9; margin-top: 4px; }
-    /* Wind colors - adjusted for blue theme */
-    .wind-slow { color: #e3f2fd; }
-    .wind-med { color: #81d4fa; }
-    .wind-fast { color: #ffcc80; }
+    /* Wind colors - subtle blue variations */
+    .wind-slow { color: #e1f5fe; }
+    .wind-med { color: #b3e5fc; }
+    .wind-fast { color: #ffd54f; }
     .wind-storm { color: #ff8a80; }
     
     .refresh { 
@@ -85,12 +85,12 @@
       width: 50px; height: 50px; 
       border: none; 
       border-radius: 50%; 
-      background: rgba(255,255,255,0.25); 
+      background: rgba(255,255,255,0.2); 
       color: white; 
       font-size: 20px; 
       cursor: pointer;
     }
-    .refresh:hover { background: rgba(255,255,255,0.35); }
+    .refresh:hover { background: rgba(255,255,255,0.3); }
     .loading { 
       text-align: center; 
       font-size: 24px; 
