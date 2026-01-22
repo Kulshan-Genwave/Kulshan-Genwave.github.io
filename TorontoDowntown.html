@@ -57,13 +57,14 @@
     }
     .hour { min-width: 130px; padding: 20px 15px; }
     .date { font-size: 20px; margin-bottom: 10px; }
-    .time { font-size: 18px; margin-bottom: 8px; font-weight: 500; }
+    .time { font-size: 18px; margin-bottom: 5px; font-weight: 500; }
+    .day-name { font-size: 14px; opacity: 0.8; margin-bottom: 8px; }
     .icon { font-size: 48px; margin: 15px 0; }
     .temps { font-size: 40px; font-weight: bold; margin-bottom: 20px; }
     .temp-lo { color: #a0c4ff; font-size: 32px; }
     .hour-temp { font-size: 32px; }
-    .details { font-size: 18px; }
-    .rain { color: #4fd0e7; font-weight: bold; }
+    .details { font-size: 16px; line-height: 1.4; }
+    .rain-snow { color: #4fd0e7; font-weight: bold; }
     .wind { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
     .wind-arrow { 
       width: 16px; height: 16px; 
@@ -71,6 +72,7 @@
       border-width: 0 3px 3px 0; 
       transform-origin: center;
     }
+    .gust { font-size: 14px; opacity: 0.9; margin-top: 4px; }
     /* Wind colors */
     .wind-slow { color: #ffffff; }
     .wind-med { color: #4fd0e7; }
@@ -94,6 +96,7 @@
       font-size: 24px; 
       padding: 100px 40px;
     }
+    small { opacity: 0.7; font-size: 0.8em; }
   </style>
 </head>
 <body>
@@ -174,7 +177,7 @@
             <div class="icon">${icon}</div>
             <div class="temps">${high}° <span class="temp-lo">/ ${low}°</span></div>
             <div class="details">
-              <div>Rain: <span class="rain">${rainChance}%</span> (${rainAmount}mm)</div>
+              <div>Rain/Snow: <span class="rain-snow">${rainChance}%</span> (${rainAmount}mm)</div>
               <div class="wind ${windClass}">
                 <span class="wind-arrow" style="transform: rotate(${windDir}deg)"></span>
                 ${windSpeed}km/h ${windDirName}
@@ -191,7 +194,7 @@
       loadingEl.style.display = 'none';
     }
 
-    // 3-Day 3-Hourly Forecast (24 hourly slots over 3 days)
+    // 3-Day 3-Hourly Forecast
     async function loadHourly() {
       const loadingEl = document.getElementById('loading2');
       const forecastEl = document.getElementById('forecast2');
@@ -201,12 +204,11 @@
       forecastEl.style.display = 'none';
       
       try {
-        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_direction_10m&timezone=America%2FToronto&forecast_days=3`);
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=America%2FToronto&forecast_days=3`);
         const data = await response.json();
         const hourly = data.hourly;
         
         hoursEl.innerHTML = '';
-        // Show every 3rd hour for 3 days (00:00, 03:00, 06:00, etc.)
         for (let i = 0; i < hourly.time.length; i += 3) {
           const date = new Date(hourly.time[i]);
           const timeStr = date.toLocaleString('en-CA', {hour: '2-digit', minute: '2-digit', hour12: true});
@@ -215,6 +217,7 @@
           const temp = Math.round(hourly.temperature_2m[i]);
           const rainChance = hourly.precipitation_probability[i];
           const windSpeed = Math.round(hourly.wind_speed_10m[i]);
+          const windGust = Math.round(hourly.wind_gusts_10m[i] || 0);
           const windDir = Math.round(hourly.wind_direction_10m[i] || 0);
           const windDirName = directions[Math.floor(windDir / 45) % 8];
           const weatherCode = hourly.weather_code[i];
@@ -224,16 +227,17 @@
           const hourDiv = document.createElement('div');
           hourDiv.className = 'hour';
           hourDiv.innerHTML = `
+            <div class="day-name">${dayName}</div>
             <div class="time">${timeStr}</div>
-            <div class="day">${dayName}</div>
             <div class="icon">${icon}</div>
             <div class="temps hour-temp">${temp}°</div>
             <div class="details">
-              <div>Rain: <span class="rain">${rainChance}%</span></div>
+              <div>Rain/Snow: <span class="rain-snow">${rainChance}%</span></div>
               <div class="wind ${windClass}">
                 <span class="wind-arrow" style="transform: rotate(${windDir}deg)"></span>
                 ${windSpeed}km/h ${windDirName}
               </div>
+              <div class="gust">Gusts: ${windGust}km/h</div>
             </div>
           `;
           hoursEl.appendChild(hourDiv);
