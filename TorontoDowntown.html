@@ -13,16 +13,14 @@
     .day::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 60px; opacity: 0.3; z-index: 0; }
     .day:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); }
     
-    /* Perfect text alignment grid */
     .day-content { display: grid; grid-template-rows: auto auto auto 1fr; height: 100%; position: relative; z-index: 1; }
     .day-date { font-size: 20px; opacity: 0.9; margin-bottom: 15px; font-weight: 600; text-align: center; grid-row: 1; }
-    .day-date span { display: block; font-size: 16px; opacity: 0.7; font-weight: 400; }
+    .day-date span { display: button; font-size: 16px; opacity: 0.7; font-weight: 400; }
     .day-icon { font-size: 48px; margin: 20px auto; grid-row: 2; justify-self: center; }
     .temps-container { grid-row: 3; position: relative; }
     .day-temps { font-size: 42px; font-weight: 700; margin-bottom: 25px; letter-spacing: -2px; text-align: center; position: relative; }
     .day-lo { color: #a0c4ff; font-weight: 500; font-size: 36px; }
     
-    /* Temperature waveform background */
     .waveform { position: absolute; top: 0; left: -100%; width: 200%; height: 100%; opacity: 0.4; z-index: 0; }
     
     .day-details { grid-row: 4; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: end; font-size: 18px; opacity: 0.9; line-height: 1.4; }
@@ -32,62 +30,4 @@
     .wind-value { font-weight: 600; font-size: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .wind-arrow { width: 20px; height: 20px; border: solid currentColor; border-width: 0 4px 4px 0; transform-origin: center; }
     
-    /* Wind color gradient: white(0) → blue(15) → green(25) → yellow(35) → red(50+) */
-    .wind-0 { color: #ffffff; }
-    .wind-1 { color: #a0c4ff; }
-    .wind-2 { color: #4fd0e7; }
-    .wind-3 { color: #90EE90; }
-    .wind-4 { color: #FFD700; }
-    .wind-5 { color: #ff4444; }
-    
-    /* Temp waveform colors: cold blue → purple → warm orange → hot red */
-    .temp-cold { background: linear-gradient(90deg, #4a69bd 0%, #6a4c93 50%, #aa76b8 100%); background-size: 200% 100%; animation: wave 4s ease-in-out infinite; }
-    .temp-cool { background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%); background-size: 200% 100%; animation: wave 4s ease-in-out infinite; }
-    .temp-mild { background: linear-gradient(90deg, #4facfe 0%, #00f2fe 50%, #43e97b 100%); background-size: 200% 100%; animation: wave 4s ease-in-out infinite; }
-    .temp-warm { background: linear-gradient(90deg, #fa709a 0%, #fee140 50%, #f77737 100%); background-size: 200% 100%; animation: wave 4s ease-in-out infinite; }
-    .temp-hot { background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); background-size: 200% 100%; animation: wave 4s ease-in-out infinite; }
-    
-    @keyframes wave { 0%, 100% { transform: translateX(0) translateY(0); } 50% { transform: translateX(-50%) translateY(-5px); } }
-    
-    .refresh { position: absolute; top: 40px; right: 40px; background: rgba(255,255,255,0.15); border: none; border-radius: 50%; width: 50px; height: 50px; color: #fff; font-size: 20px; cursor: pointer; opacity: 0.8; transition: all 0.3s; }
-    .refresh:hover { opacity: 1; background: rgba(255,255,255,0.25); transform: scale(1.1) rotate(180deg); }
-    .loading { text-align: center; font-size: 24px; font-style: italic; opacity: 0.7; padding: 100px 20px; }
-  </style>
-</head>
-<body>
-  <div class="widget">
-    <button class="refresh" onclick="loadWeather()">↻</button>
-    <div id="loading" class="loading">Loading 7-day forecast for Brampton, ON...</div>
-    <div id="content" style="display: none;">
-      <div class="title">Brampton, Ontario - 7 Day Weather Forecast</div>
-      <div class="days" id="forecast-days"></div>
-    </div>
-  </div>
-
-  <script>
-    const LAT = 43.6850; // Brampton, ON
-    const LON = -79.7858;
-    const URL = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code,wind_speed_10m_max,wind_direction_10m_dominant&timezone=America/Toronto`;
-
-    const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    const icons = {
-      0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
-      45: '🌫️', 48: '🌫️', 51: '🌦️', 53: '🌦️',
-      55: '🌧️', 61: '🌦️', 63: '🌧️', 65: '🌧️',
-      71: '🌨️', 73: '🌨️', 75: '❄️', 80: '🌦️',
-      81: '🌦️', 82: '🌧️', 95: '⛈️'
-    };
-
-    function getWindClass(windSpeed) {
-      if (windSpeed < 15) return 'wind-0';
-      if (windSpeed < 25) return 'wind-1';
-      if (windSpeed < 35) return 'wind-2';
-      if (windSpeed < 50) return 'wind-3';
-      return 'wind-4';
-    }
-
-    function getTempClass(hiTemp) {
-      if (hiTemp < 0) return 'temp-cold';
-      if (hiTemp < 10) return 'temp-cool';
-      if (hiTemp < 20) return 'temp-mild';
-      if (hiTemp < 30) retu
+    .wind-0 { c
