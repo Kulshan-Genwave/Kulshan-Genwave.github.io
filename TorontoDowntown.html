@@ -91,6 +91,10 @@
       background: rgba(255,255,255,0.2);
       border-radius: 4px;
     }
+    /* Auto-hide scrollbar */
+    .hours.hide-scrollbar::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
     .day, .hour { 
       flex: 1; 
       border-radius: 16px; 
@@ -191,7 +195,7 @@
     <div id="loading2" class="loading">Loading 3-hourly forecast...</div>
     <div id="forecast2" style="display:none;">
       <div class="title">DoubleTree Downtown Toronto - Next 3 Days (Every 3 Hours)</div>
-      <div class="hours" id="hours2"></div>
+      <div class="hours hide-scrollbar" id="hours2"></div>
     </div>
   </div>
 
@@ -200,7 +204,7 @@
     const LON = -79.3905;
     
     const icons = {
-      0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 45: '☁️', 48: '☁️',
+      0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 45: '🌫️', 48: '🌫️',
       51: '🌦️', 53: '🌦️', 55: '🌧️', 61: '🌦️', 63: '🌧️', 65: '🌧️',
       71: '❄️', 73: '❄️', 75: '❄️', 80: '🌦️', 81: '🌦️', 82: '🌧️', 95: '⛈️'
     };
@@ -221,7 +225,18 @@
       document.querySelectorAll(`[onclick="setTheme('${theme}')"]`).forEach(btn => btn.classList.add('active'));
     }
 
-    // 7-Day Forecast
+    let scrollbarTimer;
+
+    function manageScrollbar(scrollEl) {
+      clearTimeout(scrollbarTimer);
+      scrollEl.classList.remove('hide-scrollbar');
+      
+      scrollbarTimer = setTimeout(() => {
+        scrollEl.classList.add('hide-scrollbar');
+      }, 3000);
+    }
+
+    // 7-Day Forecast - starts with TODAY (index 0)
     async function loadWeather() {
       const loadingEl = document.getElementById('loading1');
       const forecastEl = document.getElementById('forecast1');
@@ -236,6 +251,7 @@
         const daily = data.daily;
         
         daysEl.innerHTML = '';
+        // Start from TODAY (index 0) - 7 days including current day
         for (let i = 0; i < 7; i++) {
           const date = new Date(daily.time[i]);
           const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
@@ -276,7 +292,7 @@
       loadingEl.style.display = 'none';
     }
 
-    // 3-Day 3-Hourly Forecast
+    // 3-Day 3-Hourly Forecast - starts from NOW
     async function loadHourly() {
       const loadingEl = document.getElementById('loading2');
       const forecastEl = document.getElementById('forecast2');
@@ -291,7 +307,12 @@
         const hourly = data.hourly;
         
         hoursEl.innerHTML = '';
-        for (let i = 0; i < hourly.time.length; i += 3) {
+        // Find current hour and start from there, then every 3rd hour
+        const now = new Date();
+        const todayStartIndex = Math.max(0, Math.floor((now - new Date(hourly.time[0])) / (3 * 60 * 60 * 1000)));
+        
+        let count = 0;
+        for (let i = todayStartIndex * 3; i < hourly.time.length && count < 24; i += 3) {
           const date = new Date(hourly.time[i]);
           const timeStr = date.toLocaleString('en-CA', {hour: '2-digit', minute: '2-digit', hour12: true});
           const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
@@ -323,6 +344,7 @@
             </div>
           `;
           hoursEl.appendChild(hourDiv);
+          count++;
         }
         
         forecastEl.style.display = 'block';
@@ -330,6 +352,23 @@
         loadingEl.innerHTML = 'Error loading hourly forecast';
       }
       loadingEl.style.display = 'none';
+    }
+
+    // Scrollbar auto-hide functionality
+    document.getElementById('hours2').addEventListener('scroll', function() {
+      manageScrollbar(this);
+    });
+    document.getElementById('hours2').addEventListener('mouseenter', function() {
+      manageScrollbar(this);
+    });
+
+    function manageScrollbar(scrollEl) {
+      clearTimeout(scrollbarTimer);
+      scrollEl.classList.remove('hide-scrollbar');
+      
+      scrollbarTimer = setTimeout(() => {
+        scrollEl.classList.add('hide-scrollbar');
+      }, 3000);
     }
 
     // Load both on start
