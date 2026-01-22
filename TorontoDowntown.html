@@ -151,12 +151,12 @@
     .wind-fast { color: #ffd54f; }
     .wind-storm { color: #ff8a80; }
     
-    /* Controls - now at bottom */
+    /* Controls - back to top right, refresh rightmost */
     .controls { 
       position: absolute; 
-      bottom: 20px; right: 40px; 
+      top: 40px; right: 40px; 
       display: flex; 
-      gap: 12px; 
+      gap: 8px; 
       align-items: center;
     }
     .refresh { 
@@ -168,6 +168,7 @@
       font-size: 20px; 
       cursor: pointer;
       transition: all 0.2s ease;
+      order: 2; /* Puts refresh rightmost */
     }
     .refresh:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
     .theme-btn { 
@@ -181,6 +182,7 @@
       transition: all 0.2s ease;
       opacity: 0.8;
       border: 1px solid rgba(255,255,255,0.1);
+      order: 1;
     }
     .theme-btn:hover, .theme-btn.active { 
       opacity: 1; 
@@ -199,14 +201,12 @@
   <!-- 7-Day Forecast Widget -->
   <div class="widget" id="widget1">
     <div class="controls">
+      <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
+      <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
+      <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
+      <button class="theme-btn" onclick="setTheme('solarized')">SOL</button>
+      <button class="theme-btn" onclick="setTheme('dracula')">DRA</button>
       <button class="refresh" onclick="loadWeather()">↻</button>
-      <div style="display: flex; gap: 4px;">
-        <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
-        <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
-        <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
-        <button class="theme-btn" onclick="setTheme('solarized')">SOL</button>
-        <button class="theme-btn" onclick="setTheme('dracula')">DRA</button>
-      </div>
     </div>
     <div id="loading1" class="loading">Loading 7-day forecast...</div>
     <div id="forecast1" style="display:none;">
@@ -218,14 +218,12 @@
   <!-- 3-Day 3-Hourly Forecast Widget -->
   <div class="widget" id="widget2">
     <div class="controls">
+      <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
+      <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
+      <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
+      <button class="theme-btn" onclick="setTheme('solarized')">SOL</button>
+      <button class="theme-btn" onclick="setTheme('dracula')">DRA</button>
       <button class="refresh" onclick="loadHourly()">↻</button>
-      <div style="display: flex; gap: 4px;">
-        <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
-        <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
-        <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
-        <button class="theme-btn" onclick="setTheme('solarized')">SOL</button>
-        <button class="theme-btn" onclick="setTheme('dracula')">DRA</button>
-      </div>
     </div>
     <div id="loading2" class="loading">Loading 3-hourly forecast...</div>
     <div id="forecast2" style="display:none;">
