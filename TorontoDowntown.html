@@ -3,85 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Windy-Style 7-Day Weather Widget</title>
+  <title>Windy-Style 7-Day Forecast Widget</title>
   <style>
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #fff; }
-    .widget { max-width: 340px; margin: 20px auto; padding: 20px; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
-    .location { text-align: center; font-size: 14px; opacity: 0.8; margin-bottom: 10px; }
-    .current { margin-bottom: 20px; }
-    .temp { font-size: 48px; font-weight: 300; text-align: center; margin: 0 0 10px; letter-spacing: -2px; }
-    .conditions { text-align: center; font-size: 16px; margin-bottom: 15px; opacity: 0.9; }
-    .today-details { display: flex; justify-content: space-around; font-size: 14px; }
-    .detail { text-align: center; }
-    .label { opacity: 0.7; font-size: 12px; }
-    .wind-arrow { display: inline-block; width: 12px; height: 12px; border: solid #fff; border-width: 0 2px 2px 0; transform-origin: center; transition: transform 0.3s; margin-right: 5px; }
-    .gust { font-size: 12px; opacity: 0.8; }
-    
-    .forecast { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-top: 10px; }
-    .forecast-title { font-size: 14px; margin-bottom: 12px; opacity: 0.9; text-align: center; }
-    .days { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
-    .days::-webkit-scrollbar { display: none; }
-    .day { flex: 0 0 80px; text-align: center; }
-    .day-date { font-size: 12px; opacity: 0.7; margin-bottom: 4px; }
-    .day-hi { font-size: 20px; font-weight: 500; margin-bottom: 2px; }
-    .day-lo { font-size: 14px; opacity: 0.8; color: #a0c4ff; }
-    .day-icon { font-size: 18px; margin: 4px 0; }
-    
-    .refresh { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; font-size: 14px; cursor: pointer; opacity: 0.6; }
-    .refresh:hover { opacity: 1; }
-    .loading { text-align: center; font-style: italic; opacity: 0.6; }
-    
-    @keyframes wind { 0%, 100% { transform: translateX(0) rotate(0deg); } 50% { transform: translateX(5px) rotate(5deg); } }
-    .breezy::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #4fd0e7, transparent); animation: wind 2s infinite; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #fff; padding: 20px; }
+    .widget { max-width: 600px; margin: 0 auto; padding: 25px; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); border-radius: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    .title { text-align: center; font-size: 18px; margin-bottom: 25px; opacity: 0.9; }
+    .days { display: flex; justify-content: space-between; gap: 10px; }
+    .day { flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px 10px; text-align: center; }
+    .day-date { font-size: 14px; opacity: 0.8; margin-bottom: 8px; font-weight: 500; }
+    .day-icon { font-size: 28px; margin: 8px 0; }
+    .day-temps { font-size: 24px; font-weight: 600; margin-bottom: 12px; letter-spacing: -1px; }
+    .day-lo { color: #a0c4ff; font-weight: 400; font-size: 20px; }
+    .day-details { font-size: 13px; opacity: 0.85; line-height: 1.4; }
+    .rain { color: #4fd0e7; font-weight: 500; }
+    .wind { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; margin-top: 4px; }
+    .wind-arrow { width: 10px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform-origin: center; }
+    .refresh { position: absolute; top: 25px; right: 25px; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 36px; height: 36px; color: #fff; font-size: 16px; cursor: pointer; opacity: 0.7; transition: all 0.2s; }
+    .refresh:hover { opacity: 1; background: rgba(255,255,255,0.2); transform: scale(1.05); }
+    .loading { text-align: center; font-size: 16px; font-style: italic; opacity: 0.6; padding: 60px 20px; }
   </style>
 </head>
 <body>
-  <div class="widget" id="widget">
+  <div class="widget" style="position: relative;">
     <button class="refresh" onclick="loadWeather()">↻</button>
-    <div id="loading" class="loading">Loading...</div>
+    <div id="loading" class="loading">Loading 7-day forecast...</div>
     <div id="content" style="display: none;">
-      <div class="location" id="location"></div>
-      
-      <div class="current">
-        <div class="temp" id="temp">--°C</div>
-        <div class="conditions" id="conditions"></div>
-        <div class="today-details">
-          <div class="detail">
-            <div class="label">Rain</div>
-            <div id="rain">--%</div>
-          </div>
-          <div class="detail">
-            <div class="label">Wind</div>
-            <div id="wind"><span class="wind-arrow" id="arrow"></span><span id="wind-speed">-- km/h</span></div>
-            <div class="gust" id="gust"></div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="forecast">
-        <div class="forecast-title">7-Day Forecast</div>
-        <div class="days" id="forecast-days"></div>
-      </div>
+      <div class="title">Brampton, ON - 7 Day Forecast</div>
+      <div class="days" id="forecast-days"></div>
     </div>
   </div>
 
   <script>
     const LAT = 43.6850; // Brampton, ON
     const LON = -79.7858;
-    const URL = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code,wind_speed_10m_max&current=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=America/Toronto`;
+    const URL = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code,wind_speed_10m_max,wind_direction_10m_dominant&timezone=America/Toronto`;
 
     const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    const codes = {
+    const icons = {
       0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
       45: '🌫️', 48: '🌫️', 51: '🌦️', 53: '🌦️',
       55: '🌧️', 61: '🌦️', 63: '🌧️', 65: '🌧️',
       71: '🌨️', 73: '🌨️', 75: '❄️', 80: '🌦️',
       81: '🌦️', 82: '🌧️', 95: '⛈️'
     };
-
-    function formatDate(unix) {
-      return new Date(unix * 1000).toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' });
-    }
 
     async function loadWeather() {
       document.getElementById('loading').style.display = 'block';
@@ -90,54 +54,54 @@
       try {
         const res = await fetch(URL);
         const data = await res.json();
-        const current = data.current;
         const daily = data.daily;
         
-        // Current
-        document.getElementById('location').textContent = 'Brampton, ON';
-        document.getElementById('temp').textContent = Math.round(current.temperature_2m) + '°C';
-        document.getElementById('conditions').textContent = Object.keys(codes).includes(String(current.weather_code)) ? codes[current.weather_code] : '🌤️';
-        document.getElementById('rain').textContent = current.precipitation_probability + '%';
-        
-        const dir = dirs[Math.round(current.wind_direction_10m / 45) % 8];
-        const arrow = document.getElementById('arrow');
-        arrow.style.transform = `rotate(${current.wind_direction_10m}deg)`;
-        document.getElementById('wind-speed').innerHTML = `${Math.round(current.wind_speed_10m)} km/h <span style="opacity:0.6;">${dir}</span>`;
-        document.getElementById('gust').textContent = current.wind_gusts_10m > 0 ? `Gusts: ${Math.round(current.wind_gusts_10m)} km/h` : '';
-        
-        // 7-Day Forecast
         const daysContainer = document.getElementById('forecast-days');
         daysContainer.innerHTML = '';
+        
         for (let i = 0; i < 7; i++) {
           const dayDiv = document.createElement('div');
           dayDiv.className = 'day';
-          const date = formatDate(daily.time[i]);
+          
+          const date = new Date(daily.time[i]);
+          const dayName = date.toLocaleDateString('en-CA', { weekday: 'short' });
+          const dateStr = date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+          
           const hi = Math.round(daily.temperature_2m_max[i]);
           const lo = Math.round(daily.temperature_2m_min[i]);
-          const rain = daily.precipitation_probability_max[i];
-          const icon = codes[daily.weather_code[i]] || '🌤️';
+          const rainProb = daily.precipitation_probability_max[i];
+          const rainAmount = daily.precipitation_sum[i].toFixed(1);
+          const windSpeed = Math.round(daily.wind_speed_10m_max[i]);
+          const windDir = Math.round(daily.wind_direction_10m_dominant[i]);
+          const dir = dirs[Math.round(windDir / 45) % 8];
+          const iconCode = daily.weather_code[i];
+          const icon = icons[iconCode] || '🌤️';
           
           dayDiv.innerHTML = `
-            <div class="day-date">${date}</div>
+            <div class="day-date">${dayName}<br><span style="font-size:12px;opacity:0.7;">${dateStr}</span></div>
             <div class="day-icon">${icon}</div>
-            <div class="day-hi">${hi}°</div>
-            <div class="day-lo">${lo}° ${rain}%</div>
+            <div class="day-temps">${hi}° <span class="day-lo">/ ${lo}°</span></div>
+            <div class="day-details">
+              <div>Rain: <span class="rain">${rainProb}%</span> (${rainAmount}mm)</div>
+              <div class="wind">
+                <span class="wind-arrow" style="transform: rotate(${windDir}deg);"></span>
+                ${windSpeed}km/h ${dir}
+              </div>
+            </div>
           `;
           daysContainer.appendChild(dayDiv);
         }
         
-        if (current.wind_speed_10m > 20) document.querySelector('.widget').classList.add('breezy');
         document.getElementById('content').style.display = 'block';
       } catch (e) {
-        document.getElementById('conditions').textContent = 'Error loading data';
+        document.getElementById('loading').innerHTML = 'Error loading forecast';
       }
       
       document.getElementById('loading').style.display = 'none';
-      document.querySelector('.widget').classList.remove('breezy');
     }
 
     loadWeather();
-    setInterval(loadWeather, 300000); // Refresh every 5 min
+    setInterval(loadWeather, 1800000); // Refresh every 30 min for forecast
   </script>
 </body>
 </html>
