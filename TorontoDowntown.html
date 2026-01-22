@@ -8,17 +8,17 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
       font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-      background: #1a1a2e; 
+      background: #1e1e2e; 
       color: white; 
       padding: 30px;
     }
     .widget { 
       width: 2000px; 
       margin: 0 auto 40px; 
-      background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); 
+      background: linear-gradient(135deg, #2596be 0%, #1e88c6 50%, #1976d2 100%); 
       border-radius: 24px; 
       padding: 40px; 
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      box-shadow: 0 20px 60px rgba(37, 150, 190, 0.4);
       position: relative;
     }
     .title { 
@@ -49,7 +49,7 @@
     }
     .day, .hour { 
       flex: 1; 
-      background: rgba(255,255,255,0.08); 
+      background: rgba(255,255,255,0.12); 
       border-radius: 16px; 
       padding: 25px; 
       text-align: center;
@@ -58,13 +58,13 @@
     .hour { min-width: 130px; padding: 20px 15px; }
     .date { font-size: 20px; margin-bottom: 10px; }
     .time { font-size: 18px; margin-bottom: 5px; font-weight: 500; }
-    .day-name { font-size: 14px; opacity: 0.8; margin-bottom: 8px; }
+    .day-name { font-size: 14px; opacity: 0.85; margin-bottom: 8px; font-weight: 500; }
     .icon { font-size: 48px; margin: 15px 0; }
     .temps { font-size: 40px; font-weight: bold; margin-bottom: 20px; }
-    .temp-lo { color: #a0c4ff; font-size: 32px; }
+    .temp-lo { color: #e1f5fe; font-size: 32px; }
     .hour-temp { font-size: 32px; }
     .details { font-size: 16px; line-height: 1.4; }
-    .rain-snow { color: #4fd0e7; font-weight: bold; }
+    .rain-snow { color: #e3f2fd; font-weight: bold; }
     .wind { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
     .wind-arrow { 
       width: 16px; height: 16px; 
@@ -73,11 +73,11 @@
       transform-origin: center;
     }
     .gust { font-size: 14px; opacity: 0.9; margin-top: 4px; }
-    /* Wind colors */
-    .wind-slow { color: #ffffff; }
-    .wind-med { color: #4fd0e7; }
-    .wind-fast { color: #ffaa00; }
-    .wind-storm { color: #ff4444; }
+    /* Wind colors - adjusted for blue theme */
+    .wind-slow { color: #e3f2fd; }
+    .wind-med { color: #81d4fa; }
+    .wind-fast { color: #ffcc80; }
+    .wind-storm { color: #ff8a80; }
     
     .refresh { 
       position: absolute; 
@@ -85,18 +85,18 @@
       width: 50px; height: 50px; 
       border: none; 
       border-radius: 50%; 
-      background: rgba(255,255,255,0.2); 
+      background: rgba(255,255,255,0.25); 
       color: white; 
       font-size: 20px; 
       cursor: pointer;
     }
-    .refresh:hover { background: rgba(255,255,255,0.3); }
+    .refresh:hover { background: rgba(255,255,255,0.35); }
     .loading { 
       text-align: center; 
       font-size: 24px; 
       padding: 100px 40px;
     }
-    small { opacity: 0.7; font-size: 0.8em; }
+    small { opacity: 0.75; font-size: 0.8em; }
   </style>
 </head>
 <body>
