@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>7-Day + 3-Day Hourly Weather Forecast</title>
+  <title>7-Day + 3-Day 3-Hourly Weather Forecast</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
@@ -27,19 +27,41 @@
       margin-bottom: 40px; 
       font-weight: 500;
     }
-    .days, .hours { display: flex; gap: 25px; }
+    .days { display: flex; gap: 25px; }
+    .hours { 
+      display: flex; 
+      gap: 15px; 
+      overflow-x: auto; 
+      padding: 10px 0;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.3) transparent;
+    }
+    .hours::-webkit-scrollbar {
+      height: 8px;
+    }
+    .hours::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+    }
+    .hours::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+      border-radius: 4px;
+    }
     .day, .hour { 
       flex: 1; 
       background: rgba(255,255,255,0.08); 
       border-radius: 16px; 
       padding: 25px; 
       text-align: center;
+      min-width: 140px;
     }
+    .hour { min-width: 130px; padding: 20px 15px; }
     .date { font-size: 20px; margin-bottom: 10px; }
     .time { font-size: 18px; margin-bottom: 8px; font-weight: 500; }
     .icon { font-size: 48px; margin: 15px 0; }
     .temps { font-size: 40px; font-weight: bold; margin-bottom: 20px; }
     .temp-lo { color: #a0c4ff; font-size: 32px; }
+    .hour-temp { font-size: 32px; }
     .details { font-size: 18px; }
     .rain { color: #4fd0e7; font-weight: bold; }
     .wind { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
@@ -85,12 +107,12 @@
     </div>
   </div>
 
-  <!-- 3-Day Hourly Forecast Widget -->
+  <!-- 3-Day 3-Hourly Forecast Widget -->
   <div class="widget" id="widget2">
     <button class="refresh" onclick="loadHourly()">↻</button>
-    <div id="loading2" class="loading">Loading hourly forecast...</div>
+    <div id="loading2" class="loading">Loading 3-hourly forecast...</div>
     <div id="forecast2" style="display:none;">
-      <div class="title">Brampton, ON - Next 72 Hours (Hourly)</div>
+      <div class="title">Brampton, ON - Next 3 Days (Every 3 Hours)</div>
       <div class="hours" id="hours2"></div>
     </div>
   </div>
@@ -169,7 +191,7 @@
       loadingEl.style.display = 'none';
     }
 
-    // 3-Day Hourly Forecast (72 hours = 72 hourly slots)
+    // 3-Day 3-Hourly Forecast (24 hourly slots over 3 days)
     async function loadHourly() {
       const loadingEl = document.getElementById('loading2');
       const forecastEl = document.getElementById('forecast2');
@@ -184,10 +206,11 @@
         const hourly = data.hourly;
         
         hoursEl.innerHTML = '';
-        // Show next 72 hours (3 days)
-        for (let i = 0; i < 72; i++) {
+        // Show every 3rd hour for 3 days (00:00, 03:00, 06:00, etc.)
+        for (let i = 0; i < hourly.time.length; i += 3) {
           const date = new Date(hourly.time[i]);
           const timeStr = date.toLocaleString('en-CA', {hour: '2-digit', minute: '2-digit', hour12: true});
+          const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
           
           const temp = Math.round(hourly.temperature_2m[i]);
           const rainChance = hourly.precipitation_probability[i];
@@ -202,8 +225,9 @@
           hourDiv.className = 'hour';
           hourDiv.innerHTML = `
             <div class="time">${timeStr}</div>
+            <div class="day">${dayName}</div>
             <div class="icon">${icon}</div>
-            <div class="temps">${temp}°</div>
+            <div class="temps hour-temp">${temp}°</div>
             <div class="details">
               <div>Rain: <span class="rain">${rainChance}%</span></div>
               <div class="wind ${windClass}">
