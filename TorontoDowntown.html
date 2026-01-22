@@ -27,6 +27,7 @@
     .theme-monday .wind-slow { color: #e2e5f0; }
     .theme-monday .wind-med { color: #a8b2d1; }
     .theme-monday .hours::-webkit-scrollbar-track { background: rgba(25,27,52,0.5); }
+    .theme-monday .theme-btn { background: rgba(255,255,255,0.15); }
     
     /* Theme: Windy Dark */
     .theme-windy .widget { 
@@ -41,6 +42,7 @@
     .theme-windy .rain-snow { color: #4fd0e7; }
     .theme-windy .wind-slow { color: #ffffff; }
     .theme-windy .wind-med { color: #4fd0e7; }
+    .theme-windy .theme-btn { background: rgba(255,255,255,0.2); }
     
     /* Theme: Ocean Blue */
     .theme-ocean .widget { 
@@ -55,6 +57,37 @@
     .theme-ocean .rain-snow { color: #e1f5fe; }
     .theme-ocean .wind-slow { color: #e1f5fe; }
     .theme-ocean .wind-med { color: #b3e5fc; }
+    .theme-ocean .theme-btn { background: rgba(255,255,255,0.2); }
+    
+    /* Theme: Solarized Dark */
+    .theme-solarized .widget { 
+      background: linear-gradient(135deg, #002b36 0%, #073642 50%, #0a3642 100%); 
+      box-shadow: 0 20px 60px rgba(0, 43, 54, 0.5);
+    }
+    .theme-solarized .day, .theme-solarized .hour { 
+      background: rgba(147, 161, 161, 0.3); 
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .theme-solarized .temp-lo { color: #93a1a1; }
+    .theme-solarized .rain-snow { color: #b8cccf; }
+    .theme-solarized .wind-slow { color: #eee8d5; }
+    .theme-solarized .wind-med { color: #859900; }
+    .theme-solarized .theme-btn { background: rgba(38, 139, 210, 0.3); }
+    
+    /* Theme: Dracula */
+    .theme-dracula .widget { 
+      background: linear-gradient(135deg, #191a2e 0%, #212336 50%, #2a1f44 100%); 
+      box-shadow: 0 20px 60px rgba(25, 26, 46, 0.6);
+    }
+    .theme-dracula .day, .theme-dracula .hour { 
+      background: rgba(68, 71, 90, 0.5); 
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .theme-dracula .temp-lo { color: #f8f8f2; }
+    .theme-dracula .rain-snow { color: #bdc3c7; }
+    .theme-dracula .wind-slow { color: #f8f8f2; }
+    .theme-dracula .wind-med { color: #ff79c6; }
+    .theme-dracula .theme-btn { background: rgba(255, 121, 198, 0.2); }
     
     /* Base widget styles */
     .widget { 
@@ -91,10 +124,6 @@
       background: rgba(255,255,255,0.2);
       border-radius: 4px;
     }
-    /* Auto-hide scrollbar */
-    .hours.hide-scrollbar::-webkit-scrollbar-thumb {
-      background: transparent;
-    }
     .day, .hour { 
       flex: 1; 
       border-radius: 16px; 
@@ -122,14 +151,13 @@
     .wind-fast { color: #ffd54f; }
     .wind-storm { color: #ff8a80; }
     
-    /* Controls */
+    /* Controls - now at bottom */
     .controls { 
       position: absolute; 
-      top: 40px; right: 40px; 
+      bottom: 20px; right: 40px; 
       display: flex; 
-      gap: 8px; 
-      flex-direction: column;
-      align-items: flex-end;
+      gap: 12px; 
+      align-items: center;
     }
     .refresh { 
       width: 50px; height: 50px; 
@@ -143,18 +171,21 @@
     }
     .refresh:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
     .theme-btn { 
-      width: 50px; height: 30px; 
+      width: 45px; height: 35px; 
       border: none; 
       border-radius: 8px; 
       color: white; 
-      font-size: 11px; 
+      font-size: 10px; 
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      opacity: 0.7;
+      opacity: 0.8;
+      border: 1px solid rgba(255,255,255,0.1);
     }
     .theme-btn:hover, .theme-btn.active { 
       opacity: 1; 
       transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     .loading { 
       text-align: center; 
@@ -169,10 +200,12 @@
   <div class="widget" id="widget1">
     <div class="controls">
       <button class="refresh" onclick="loadWeather()">↻</button>
-      <div>
+      <div style="display: flex; gap: 4px;">
         <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
         <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
         <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
+        <button class="theme-btn" onclick="setTheme('solarized')">SOL</button>
+        <button class="theme-btn" onclick="setTheme('dracula')">DRA</button>
       </div>
     </div>
     <div id="loading1" class="loading">Loading 7-day forecast...</div>
@@ -186,16 +219,18 @@
   <div class="widget" id="widget2">
     <div class="controls">
       <button class="refresh" onclick="loadHourly()">↻</button>
-      <div>
+      <div style="display: flex; gap: 4px;">
         <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
         <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
         <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
+        <button class="theme-btn" onclick="setTheme('solarized')">SOL</button>
+        <button class="theme-btn" onclick="setTheme('dracula')">DRA</button>
       </div>
     </div>
     <div id="loading2" class="loading">Loading 3-hourly forecast...</div>
     <div id="forecast2" style="display:none;">
       <div class="title">DoubleTree Downtown Toronto - Next 3 Days (Every 3 Hours)</div>
-      <div class="hours hide-scrollbar" id="hours2"></div>
+      <div class="hours" id="hours2"></div>
     </div>
   </div>
 
@@ -225,18 +260,7 @@
       document.querySelectorAll(`[onclick="setTheme('${theme}')"]`).forEach(btn => btn.classList.add('active'));
     }
 
-    let scrollbarTimer;
-
-    function manageScrollbar(scrollEl) {
-      clearTimeout(scrollbarTimer);
-      scrollEl.classList.remove('hide-scrollbar');
-      
-      scrollbarTimer = setTimeout(() => {
-        scrollEl.classList.add('hide-scrollbar');
-      }, 3000);
-    }
-
-    // 7-Day Forecast - starts with TODAY (index 0)
+    // 7-Day Forecast
     async function loadWeather() {
       const loadingEl = document.getElementById('loading1');
       const forecastEl = document.getElementById('forecast1');
@@ -251,7 +275,6 @@
         const daily = data.daily;
         
         daysEl.innerHTML = '';
-        // Start from TODAY (index 0) - 7 days including current day
         for (let i = 0; i < 7; i++) {
           const date = new Date(daily.time[i]);
           const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
@@ -292,7 +315,7 @@
       loadingEl.style.display = 'none';
     }
 
-    // 3-Day 3-Hourly Forecast - starts from NOW
+    // 3-Day 3-Hourly Forecast
     async function loadHourly() {
       const loadingEl = document.getElementById('loading2');
       const forecastEl = document.getElementById('forecast2');
@@ -307,12 +330,7 @@
         const hourly = data.hourly;
         
         hoursEl.innerHTML = '';
-        // Find current hour and start from there, then every 3rd hour
-        const now = new Date();
-        const todayStartIndex = Math.max(0, Math.floor((now - new Date(hourly.time[0])) / (3 * 60 * 60 * 1000)));
-        
-        let count = 0;
-        for (let i = todayStartIndex * 3; i < hourly.time.length && count < 24; i += 3) {
+        for (let i = 0; i < hourly.time.length; i += 3) {
           const date = new Date(hourly.time[i]);
           const timeStr = date.toLocaleString('en-CA', {hour: '2-digit', minute: '2-digit', hour12: true});
           const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
@@ -344,7 +362,6 @@
             </div>
           `;
           hoursEl.appendChild(hourDiv);
-          count++;
         }
         
         forecastEl.style.display = 'block';
@@ -352,23 +369,6 @@
         loadingEl.innerHTML = 'Error loading hourly forecast';
       }
       loadingEl.style.display = 'none';
-    }
-
-    // Scrollbar auto-hide functionality
-    document.getElementById('hours2').addEventListener('scroll', function() {
-      manageScrollbar(this);
-    });
-    document.getElementById('hours2').addEventListener('mouseenter', function() {
-      manageScrollbar(this);
-    });
-
-    function manageScrollbar(scrollEl) {
-      clearTimeout(scrollbarTimer);
-      scrollEl.classList.remove('hide-scrollbar');
-      
-      scrollbarTimer = setTimeout(() => {
-        scrollEl.classList.add('hide-scrollbar');
-      }, 3000);
     }
 
     // Load both on start
