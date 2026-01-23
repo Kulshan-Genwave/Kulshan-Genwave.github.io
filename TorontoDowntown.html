@@ -59,35 +59,35 @@
     .theme-ocean .wind-med { color: #b3e5fc; }
     .theme-ocean .theme-btn { background: rgba(255,255,255,0.2); }
     
-    /* Theme: Solarized Dark */
-    .theme-solarized .widget { 
+    /* Theme: forest Dark */
+    .theme-forest .widget { 
       background: linear-gradient(135deg, #002b36 0%, #073642 50%, #0a3642 100%); 
       box-shadow: 0 20px 60px rgba(0, 43, 54, 0.5);
     }
-    .theme-solarized .day, .theme-solarized .hour { 
+    .theme-forest .day, .theme-forest .hour { 
       background: rgba(147, 161, 161, 0.3); 
       border: 1px solid rgba(255,255,255,0.15);
     }
-    .theme-solarized .temp-lo { color: #93a1a1; }
-    .theme-solarized .rain-snow { color: #b8cccf; }
-    .theme-solarized .wind-slow { color: #eee8d5; }
-    .theme-solarized .wind-med { color: #859900; }
-    .theme-solarized .theme-btn { background: rgba(38, 139, 210, 0.3); }
+    .theme-forest .temp-lo { color: #93a1a1; }
+    .theme-forest .rain-snow { color: #b8cccf; }
+    .theme-forest .wind-slow { color: #eee8d5; }
+    .theme-forest .wind-med { color: #859900; }
+    .theme-forest .theme-btn { background: rgba(38, 139, 210, 0.3); }
     
-    /* Theme: Dracula */
-    .theme-dracula .widget { 
+    /* Theme: purple */
+    .theme-purple .widget { 
       background: linear-gradient(135deg, #191a2e 0%, #212336 50%, #2a1f44 100%); 
       box-shadow: 0 20px 60px rgba(25, 26, 46, 0.6);
     }
-    .theme-dracula .day, .theme-dracula .hour { 
+    .theme-purple .day, .theme-purple .hour { 
       background: rgba(68, 71, 90, 0.5); 
       border: 1px solid rgba(255,255,255,0.1);
     }
-    .theme-dracula .temp-lo { color: #f8f8f2; }
-    .theme-dracula .rain-snow { color: #bdc3c7; }
-    .theme-dracula .wind-slow { color: #f8f8f2; }
-    .theme-dracula .wind-med { color: #ff79c6; }
-    .theme-dracula .theme-btn { background: rgba(255, 121, 198, 0.2); }
+    .theme-purple .temp-lo { color: #f8f8f2; }
+    .theme-purple .rain-snow { color: #bdc3c7; }
+    .theme-purple .wind-slow { color: #f8f8f2; }
+    .theme-purple .wind-med { color: #ff79c6; }
+    .theme-purple .theme-btn { background: rgba(255, 121, 198, 0.2); }
     
     /* Base widget styles */
     .widget { 
@@ -203,8 +203,8 @@
       <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
       <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
       <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
-      <button class="theme-btn" onclick="setTheme('solarized')">SOL</button>
-      <button class="theme-btn" onclick="setTheme('dracula')">DRA</button>
+      <button class="theme-btn" onclick="setTheme('forest')">FOR</button>
+      <button class="theme-btn" onclick="setTheme('purple')">PUR</button>
       <button class="refresh" onclick="loadWeather()">↻</button>
     </div>
     <div id="loading1" class="loading">Loading 7-day forecast...</div>
@@ -220,8 +220,8 @@
       <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
       <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
       <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
-      <button class="theme-btn" onclick="setTheme('solarized')">SOL</button>
-      <button class="theme-btn" onclick="setTheme('dracula')">DRA</button>
+      <button class="theme-btn" onclick="setTheme('forest')">FOR</button>
+      <button class="theme-btn" onclick="setTheme('purple')">PUR</button>
       <button class="refresh" onclick="loadHourly()">↻</button>
     </div>
     <div id="loading2" class="loading">Loading 3-hourly forecast...</div>
@@ -236,7 +236,7 @@
     const LON = -79.3905;
     
     const icons = {
-      0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 45: '🌫️', 48: '🌫️',
+      0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 45: '☁️', 48: '☁️',
       51: '🌦️', 53: '🌦️', 55: '🌧️', 61: '🌦️', 63: '🌧️', 65: '🌧️',
       71: '❄️', 73: '❄️', 75: '❄️', 80: '🌦️', 81: '🌦️', 82: '🌧️', 95: '⛈️'
     };
@@ -278,7 +278,7 @@
         
         daysEl.innerHTML = '';
         // Start from today (i=0) through next 6 days
-        for (let i = 0; i < 7; i++) {
+        for (let i = 1; i < 8; i++) {
           const date = new Date(daily.time[i]);
           const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
           const dateStr = date.toLocaleDateString('en-CA', {month: 'short', day: 'numeric'});
