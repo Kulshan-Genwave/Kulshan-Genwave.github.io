@@ -278,7 +278,7 @@
         
         daysEl.innerHTML = '';
         // Start from today (i=0) through next 6 days
-        for (let i = 1; i < 8; i++) {
+        for (let i = 0; i < 7; i++) {
           const date = new Date(daily.time[i]);
           const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
           const dateStr = date.toLocaleDateString('en-CA', {month: 'short', day: 'numeric'});
