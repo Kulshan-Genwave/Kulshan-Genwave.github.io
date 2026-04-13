@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>7-Day + 3-Day 3-Hourly Weather Forecast</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+      background: #0f111a; 
+      color: white; 
+      padding: 30px;
+    }
+    
+    /* Theme: Monday.com Dark */
+    .theme-monday .widget { 
+      background: linear-gradient(135deg, #191b34 0%, #1a1d3a 50%, #1f2341 100%); 
+      box-shadow: 0 20px 60px rgba(25, 27, 52, 0.5);
+    }
+    .theme-monday .day, .theme-monday .hour { 
+      background: rgba(25, 27, 52, 0.6); 
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .theme-monday .temp-lo { color: #b8c1e0; }
+    .theme-monday .rain-snow { color: #c8d0e8; }
+    .theme-monday .wind-slow { color: #e2e5f0; }
+    .theme-monday .wind-med { color: #a8b2d1; }
+    .theme-monday .hours::-webkit-scrollbar-track { background: rgba(25,27,52,0.5); }
+    .theme-monday .theme-btn { background: rgba(255,255,255,0.15); }
+    
+    /* Theme: Windy Dark */
+    .theme-windy .widget { 
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); 
+      box-shadow: 0 20px 60px rgba(15, 52, 96, 0.5);
+    }
+    .theme-windy .day, .theme-windy .hour { 
+      background: rgba(255,255,255,0.15); 
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .theme-windy .temp-lo { color: #a0c4ff; }
+    .theme-windy .rain-snow { color: #4fd0e7; }
+    .theme-windy .wind-slow { color: #ffffff; }
+    .theme-windy .wind-med { color: #4fd0e7; }
+    .theme-windy .theme-btn { background: rgba(255,255,255,0.2); }
+    
+    /* Theme: Ocean Blue */
+    .theme-ocean .widget { 
+      background: linear-gradient(135deg, #1f8aa6 0%, #2596be 50%, #2da5c9 100%); 
+      box-shadow: 0 20px 60px rgba(37, 150, 190, 0.3);
+    }
+    .theme-ocean .day, .theme-ocean .hour { 
+      background: rgba(37, 150, 190, 0.25); 
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .theme-ocean .temp-lo { color: #b3e5fc; }
+    .theme-ocean .rain-snow { color: #e1f5fe; }
+    .theme-ocean .wind-slow { color: #e1f5fe; }
+    .theme-ocean .wind-med { color: #b3e5fc; }
+    .theme-ocean .theme-btn { background: rgba(255,255,255,0.2); }
+    
+    /* Theme: forest Dark */
+    .theme-forest .widget { 
+      background: linear-gradient(135deg, #002b36 0%, #073642 50%, #0a3642 100%); 
+      box-shadow: 0 20px 60px rgba(0, 43, 54, 0.5);
+    }
+    .theme-forest .day, .theme-forest .hour { 
+      background: rgba(147, 161, 161, 0.3); 
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .theme-forest .temp-lo { color: #93a1a1; }
+    .theme-forest .rain-snow { color: #b8cccf; }
+    .theme-forest .wind-slow { color: #eee8d5; }
+    .theme-forest .wind-med { color: #859900; }
+    .theme-forest .theme-btn { background: rgba(38, 139, 210, 0.3); }
+    
+    /* Theme: purple */
+    .theme-purple .widget { 
+      background: linear-gradient(135deg, #191a2e 0%, #212336 50%, #2a1f44 100%); 
+      box-shadow: 0 20px 60px rgba(25, 26, 46, 0.6);
+    }
+    .theme-purple .day, .theme-purple .hour { 
+      background: rgba(68, 71, 90, 0.5); 
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .theme-purple .temp-lo { color: #f8f8f2; }
+    .theme-purple .rain-snow { color: #bdc3c7; }
+    .theme-purple .wind-slow { color: #f8f8f2; }
+    .theme-purple .wind-med { color: #ff79c6; }
+    .theme-purple .theme-btn { background: rgba(255, 121, 198, 0.2); }
+    
+    /* Base widget styles */
+    .widget { 
+      width: 2000px; 
+      margin: 0 auto 40px; 
+      border-radius: 24px; 
+      padding: 40px; 
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .title { 
+      text-align: center; 
+      font-size: 32px; 
+      margin-bottom: 40px; 
+      font-weight: 500;
+    }
+    .days { display: flex; gap: 25px; }
+    .hours { 
+      display: flex; 
+      gap: 15px; 
+      overflow-x: auto; 
+      padding: 10px 0;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.2) transparent;
+    }
+    .hours::-webkit-scrollbar {
+      height: 8px;
+    }
+    .hours::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.3);
+      border-radius: 4px;
+    }
+    .hours::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+    }
+    .day, .hour { 
+      flex: 1; 
+      border-radius: 16px; 
+      padding: 25px; 
+      text-align: center;
+      min-width: 140px;
+      transition: all 0.2s ease;
+    }
+    .hour { min-width: 130px; padding: 20px 15px; }
+    .date { font-size: 20px; margin-bottom: 10px; }
+    .time { font-size: 18px; margin-bottom: 5px; font-weight: 500; }
+    .day-name { font-size: 14px; opacity: 0.85; margin-bottom: 8px; font-weight: 500; }
+    .icon { font-size: 48px; margin: 15px 0; }
+    .temps { font-size: 40px; font-weight: bold; margin-bottom: 20px; }
+    .hour-temp { font-size: 32px; }
+    .details { font-size: 16px; line-height: 1.4; }
+    .wind { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
+    .wind-arrow { 
+      width: 16px; height: 16px; 
+      border: solid currentColor; 
+      border-width: 2px 2px 0 0; 
+      transform-origin: center;
+      transform: rotate(45deg);
+    }
+    .gust { font-size: 14px; opacity: 0.9; margin-top: 4px; }
+    .wind-fast { color: #ffd54f; }
+    .wind-storm { color: #ff8a80; }
+    
+    /* Controls - top right, refresh rightmost */
+    .controls { 
+      position: absolute; 
+      top: 40px; right: 40px; 
+      display: flex; 
+      gap: 8px; 
+      align-items: center;
+    }
+    .refresh { 
+      width: 50px; height: 50px; 
+      border: none; 
+      border-radius: 12px; 
+      background: rgba(255,255,255,0.15); 
+      color: white; 
+      font-size: 20px; 
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .refresh:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
+    .theme-btn { 
+      width: 45px; height: 35px; 
+      border: none; 
+      border-radius: 8px; 
+      color: white; 
+      font-size: 10px; 
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0.8;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .theme-btn:hover, .theme-btn.active { 
+      opacity: 1; 
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .loading { 
+      text-align: center; 
+      font-size: 24px; 
+      padding: 100px 40px;
+    }
+    small { opacity: 0.75; font-size: 0.8em; }
+  </style>
+</head>
+<body class="theme-monday">
+  <!-- 7-Day Forecast Widget -->
+  <div class="widget" id="widget1">
+    <div class="controls">
+      <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
+      <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
+      <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
+      <button class="theme-btn" onclick="setTheme('forest')">FOR</button>
+      <button class="theme-btn" onclick="setTheme('purple')">PUR</button>
+      <button class="refresh" onclick="loadWeather()">↻</button>
+    </div>
+    <div id="loading1" class="loading">Loading 7-day forecast...</div>
+    <div id="forecast1" style="display:none;">
+      <div class="title">Downtown Vancouver - 7 Day Forecast</div>
+      <div class="days" id="days1"></div>
+    </div>
+  </div>
+
+  <!-- 3-Day 3-Hourly Forecast Widget -->
+  <div class="widget" id="widget2">
+    <div class="controls">
+      <button class="theme-btn active" onclick="setTheme('monday')">MON</button>
+      <button class="theme-btn" onclick="setTheme('windy')">WIN</button>
+      <button class="theme-btn" onclick="setTheme('ocean')">OCE</button>
+      <button class="theme-btn" onclick="setTheme('forest')">FOR</button>
+      <button class="theme-btn" onclick="setTheme('purple')">PUR</button>
+      <button class="refresh" onclick="loadHourly()">↻</button>
+    </div>
+    <div id="loading2" class="loading">Loading 3-hourly forecast...</div>
+    <div id="forecast2" style="display:none;">
+      <div class="title">Next 3 Days (Every 3 Hours)</div>
+      <div class="hours" id="hours2"></div>
+    </div>
+  </div>
+
+  <script>
+    const LAT = 49.278847;  // DoubleTree by Hilton Toronto Downtown
+    const LON = -123.117133;
+    
+    const icons = {
+      0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 45: '☁️', 48: '☁️',
+      51: '🌦️', 53: '🌦️', 55: '🌧️', 61: '🌦️', 63: '🌧️', 65: '🌧️',
+      71: '❄️', 73: '❄️', 75: '❄️', 80: '🌦️', 81: '🌦️', 82: '🌧️', 95: '⛈️'
+    };
+
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+    function getWindClass(speed) {
+      if (speed < 15) return 'wind-slow';
+      if (speed < 30) return 'wind-med';
+      if (speed < 50) return 'wind-fast';
+      return 'wind-storm';
+    }
+
+    function getWindArrowRotation(deg) {
+      // North (0°) points up, East (90°) points right, etc.
+      return (deg - 45); // Offset so north arrow points up
+    }
+
+    function setTheme(theme) {
+      document.body.className = '';
+      document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+      document.body.classList.add(`theme-${theme}`);
+      document.querySelectorAll(`[onclick="setTheme('${theme}')"]`).forEach(btn => btn.classList.add('active'));
+    }
+
+    // 7-Day Forecast - starts from TODAY (index 0)
+    async function loadWeather() {
+      const loadingEl = document.getElementById('loading1');
+      const forecastEl = document.getElementById('forecast1');
+      const daysEl = document.getElementById('days1');
+      
+      loadingEl.style.display = 'block';
+      forecastEl.style.display = 'none';
+      
+      try {
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code,wind_speed_10m_max,wind_direction_10m_dominant&timezone=America%2FToronto`);
+        const data = await response.json();
+        const daily = data.daily;
+        
+        daysEl.innerHTML = '';
+        // Start from today (i=0) through next 6 days
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(daily.time[i]);
+          const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
+          const dateStr = date.toLocaleDateString('en-CA', {month: 'short', day: 'numeric'});
+          
+          const high = Math.round(daily.temperature_2m_max[i]);
+          const low = Math.round(daily.temperature_2m_min[i]);
+          const rainChance = daily.precipitation_probability_max[i];
+          const rainAmount = daily.precipitation_sum[i].toFixed(1);
+          const windSpeed = Math.round(daily.wind_speed_10m_max[i]);
+          const windDir = Math.round(daily.wind_direction_10m_dominant[i] || 0);
+          const windDirName = directions[Math.floor(windDir / 45) % 8];
+          const weatherCode = daily.weather_code[i];
+          const icon = icons[weatherCode] || '🌤️';
+          const windClass = getWindClass(windSpeed);
+          
+          const dayDiv = document.createElement('div');
+          dayDiv.className = 'day';
+          dayDiv.innerHTML = `
+            <div class="date">${dayName}<br><small>${dateStr}</small></div>
+            <div class="icon">${icon}</div>
+            <div class="temps">${high}° <span class="temp-lo">/ ${low}°</span></div>
+            <div class="details">
+              <div>Rain/Snow: <span class="rain-snow">${rainChance}%</span> (${rainAmount}mm)</div>
+              <div class="wind ${windClass}">
+                <span class="wind-arrow" style="transform: rotate(${getWindArrowRotation(windDir)}deg);"></span>
+                ${windSpeed}km/h ${windDirName}
+              </div>
+            </div>
+          `;
+          daysEl.appendChild(dayDiv);
+        }
+        
+        forecastEl.style.display = 'block';
+      } catch (error) {
+        loadingEl.innerHTML = 'Error loading forecast';
+      }
+      loadingEl.style.display = 'none';
+    }
+
+    // 3-Day 3-Hourly Forecast
+    async function loadHourly() {
+      const loadingEl = document.getElementById('loading2');
+      const forecastEl = document.getElementById('forecast2');
+      const hoursEl = document.getElementById('hours2');
+      
+      loadingEl.style.display = 'block';
+      forecastEl.style.display = 'none';
+      
+      try {
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=America%2FToronto&forecast_days=3`);
+        const data = await response.json();
+        const hourly = data.hourly;
+        
+        hoursEl.innerHTML = '';
+        for (let i = 0; i < hourly.time.length; i += 3) {
+          const date = new Date(hourly.time[i]);
+          const timeStr = date.toLocaleString('en-CA', {hour: '2-digit', minute: '2-digit', hour12: true});
+          const dayName = date.toLocaleDateString('en-CA', {weekday: 'short'});
+          
+          const temp = Math.round(hourly.temperature_2m[i]);
+          const rainChance = hourly.precipitation_probability[i];
+          const windSpeed = Math.round(hourly.wind_speed_10m[i]);
+          const windGust = Math.round(hourly.wind_gusts_10m[i] || 0);
+          const windDir = Math.round(hourly.wind_direction_10m[i] || 0);
+          const windDirName = directions[Math.floor(windDir / 45) % 8];
+          const weatherCode = hourly.weather_code[i];
+          const icon = icons[weatherCode] || '🌤️';
+          const windClass = getWindClass(windSpeed);
+          
+          const hourDiv = document.createElement('div');
+          hourDiv.className = 'hour';
+          hourDiv.innerHTML = `
+            <div class="day-name">${dayName}</div>
+            <div class="time">${timeStr}</div>
+            <div class="icon">${icon}</div>
+            <div class="temps hour-temp">${temp}°</div>
+            <div class="details">
+              <div>Rain/Snow: <span class="rain-snow">${rainChance}%</span></div>
+              <div class="wind ${windClass}">
+                <span class="wind-arrow" style="transform: rotate(${getWindArrowRotation(windDir)}deg);"></span>
+                ${windSpeed}km/h ${windDirName}
+              </div>
+              <div class="gust">Gusts: ${windGust}km/h</div>
+            </div>
+          `;
+          hoursEl.appendChild(hourDiv);
+        }
+        
+        forecastEl.style.display = 'block';
+      } catch (error) {
+        loadingEl.innerHTML = 'Error loading hourly forecast';
+      }
+      loadingEl.style.display = 'none';
+    }
+
+    // Load both on start
+    loadWeather();
+    loadHourly();
+    setInterval(() => {
+      loadWeather();
+      loadHourly();
+    }, 30 * 60 * 1000);
+  </script>
+</body>
+</html>
